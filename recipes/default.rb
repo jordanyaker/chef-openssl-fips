@@ -43,10 +43,10 @@ execute 'unarchive_openssl' do
   not_if  { ::File.directory?(src_dirpath) }
 end
 
-#cnf_patch_file = '/tmp/fips_mode.patch'
-#cookbook_file 'fips_mode.patch' do
-#  path cnf_patch_file
-#end
+cnf_patch_file = '/tmp/fips_mode.patch'
+cookbook_file 'fips_mode.patch' do
+  path cnf_patch_file
+end
 
 configure_flags = node['openssl_fips']['openssl']['configure_flags'].map { |x| x }
 configure_flags << "--prefix=#{fips_dirpath}"
@@ -54,24 +54,21 @@ configure_flags << "fips" << "--with-fipsdir=#{node['openssl_fips']['openssl']['
 
 execute 'compile_openssl_source' do
   cwd  src_dirpath
-#  command <<-EOH
-#    patch apps/openssl.cnf < #{cnf_patch_file}
-#    ./config #{configure_flags.join(' ')} && make && make install
-#  EOH
   command <<-EOH
+    patch apps/openssl.cnf < #{cnf_patch_file}
     ./config #{configure_flags.join(' ')} && make && make install
   EOH
   not_if { ::File.directory?(node['openssl_fips']['openssl']['prefix']) }
 end
 
-# update ld.so.conf
-#file '/etc/ld.so.conf.d/openssl-fips.conf' do
-#  mode     '0444'
-#  content  "#{node['openssl_fips']['openssl']['prefix']}/lib"
-#  notifies :run, 'execute[ldconfig]'
-#end
+ update ld.so.conf
+file '/etc/ld.so.conf.d/openssl-fips.conf' do
+  mode     '0444'
+  content  "#{node['openssl_fips']['openssl']['prefix']}/lib"
+  notifies :run, 'execute[ldconfig]'
+end
 
-#execute 'ldconfig'
+execute 'ldconfig'
 #
 #profile_file = '/etc/profile.d/openssl.sh'
 #cookbook_file 'openssl.sh' do
