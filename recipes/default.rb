@@ -18,14 +18,12 @@ execute 'unarchive_fips' do
   not_if { ::File.directory?(src_dirpath) }
 end
 
-fips_dirpath  = "#{Chef::Config['file_cache_path'] || '/tmp'}/openssl-fipsmodule-#{node['openssl_fips']['fips']['version']}"
-
 execute 'compile_fips_source' do
   cwd     src_dirpath
   command <<-EOH
-        ./config --prefix=#{fips_dirpath} && make && make install
+        ./config "--prefix=#{node['openssl_fips']['fips']['prefix']}" && make && make install
   EOH
-  not_if { ::File.directory?(fips_dirpath) }
+  not_if { ::File.directory?(node['openssl_fips']['fips']['prefix']) }
 end
 
 src_dirpath  = "#{Chef::Config['file_cache_path'] || '/tmp'}/openssl-#{node['openssl_fips']['openssl']['version']}"
@@ -49,8 +47,8 @@ cookbook_file 'fips_mode.patch' do
 end
 
 configure_flags = node['openssl_fips']['openssl']['configure_flags'].map { |x| x }
-configure_flags << "--prefix=#{fips_dirpath}"
-configure_flags << "fips" << "--with-fipsdir=#{node['openssl_fips']['openssl']['prefix']}"
+configure_flags << "--prefix=#{node['openssl_fips']['openssl']['prefix']}"
+configure_flags << "fips" << "--with-fipsdir=#{node['openssl_fips']['fips']['prefix']}"
 
 execute 'compile_openssl_source' do
   cwd  src_dirpath
