@@ -56,7 +56,7 @@ execute 'compile_openssl_source' do
     patch apps/openssl.cnf < #{cnf_patch_file}
     ./config #{configure_flags.join(' ')} && make && make install
   EOH
-  not_if { ::File.directory?(node['openssl_fips']['openssl']['prefix']) }
+  not_if { ::File.directory?("#{node['openssl_fips']['openssl']['prefix']}/ssl/certs") }
 end
 
 # update ld.so.conf
