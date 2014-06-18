@@ -62,7 +62,7 @@ end
 # update ld.so.conf
 file '/etc/ld.so.conf.d/openssl-fips.conf' do
   mode     '0444'
-  content  "#{node['openssl_fips']['openssl']['prefix']}/lib"
+  content  "#{node['openssl_fips']['openssl']['prefix']}/ssl/lib"
   notifies :run, 'execute[ldconfig]'
 end
 
