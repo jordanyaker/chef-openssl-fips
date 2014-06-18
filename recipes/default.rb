@@ -61,7 +61,7 @@ execute 'compile_openssl_source' do
   not_if { ::File.directory?(node['openssl_fips']['openssl']['prefix']) }
 end
 
- update ld.so.conf
+# update ld.so.conf
 file '/etc/ld.so.conf.d/openssl-fips.conf' do
   mode     '0444'
   content  "#{node['openssl_fips']['openssl']['prefix']}/lib"
