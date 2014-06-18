@@ -49,8 +49,8 @@ end
 #end
 
 configure_flags = node['openssl_fips']['openssl']['configure_flags'].map { |x| x }
-configure_flags << "--prefix=#{node['openssl_fips']['openssl']['prefix']}"
-configure_flags << "fips" << "--with-fipsdir=#{fips_dirpath}"
+configure_flags << "--prefix=#{fips_dirpath}"
+configure_flags << "fips" << "--with-fipsdir=#{node['openssl_fips']['openssl']['prefix']}"
 
 execute 'compile_openssl_source' do
   cwd  src_dirpath
